@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">ScoreBoardApp</string>
+    <string name="team_a">Team A</string>
+    <string name="team_b">Team B</string>
+    <string name="button_a">Increase A</string>
+    <string name="button_b">Increase B</string>
+    <string name="vs">VS</string>
+    <string name="button_reset_scores">Reset Scores</string>
+</resources>

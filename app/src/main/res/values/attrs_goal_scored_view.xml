@@ -1,0 +1,5 @@
+<resources>
+    <declare-styleable name="GoalScoredView">
+        <attr name="goal_color" format="color"/>
+    </declare-styleable>
+</resources>
