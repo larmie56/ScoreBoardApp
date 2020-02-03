@@ -22,6 +22,7 @@ import java.util.List;
 /**
  * TODO: document your custom view class.
  */
+
 public class GoalScoredView extends View {
 
     private Paint mFillPaint;
@@ -99,7 +100,6 @@ public class GoalScoredView extends View {
             mGoalRect[index] = new Rect(x, y, x + (int) mShapeSize, y + (int) mShapeSize);
         }
     }
-
 
 
     @Override
@@ -181,12 +181,14 @@ public class GoalScoredView extends View {
     }
 
     private class GoalScoredAccessibilityHelper extends ExploreByTouchHelper {
-        /**
+
+/**
          * Constructs a new helper that can expose a virtual view hierarchy for the
          * specified host view.
          *
          * @param host view whose virtual view hierarchy is exposed by this helper
          */
+
         public GoalScoredAccessibilityHelper(@NonNull View host) {
             super(host);
         }

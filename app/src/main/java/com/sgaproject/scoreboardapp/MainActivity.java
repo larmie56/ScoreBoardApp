@@ -1,86 +1,119 @@
 package com.sgaproject.scoreboardapp;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.databinding.DataBindingUtil;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProviders;
 
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
 
+import com.sgaproject.scoreboardapp.databinding.ActivityMainBinding;
+import com.sgaproject.scoreboardapp.model.GoalScoredModel;
+
 public class MainActivity extends AppCompatActivity {
 
-    private static int GOAL_SCORED = 5;
+    ActivityMainBinding mBinding;
+
+    private int GOAL_SCORED_A;
+    private int GOAL_SCORED_B;
     private TextView mTextTeamAScore;
     private TextView mTextTeamBScore;
-    private static final String TEAM_A_SCORE = "com.sgaproject.scoreboardapp.TEAM_A_SCORE";
-    private static final String TEAM_B_SCORE = "com.sgaproject.scoreboardapp.TEAM_B_SCORE";
     private GoalScoredView mGoalScoredViewA;
     private GoalScoredView mGoalScoredViewB;
-    private int mScoreA = 1;
-    private int mScoreB = 1;
+    private boolean mShowScores = false;
+
+    GoalScoredModel mViewModel;
+    Observer<Integer> mGoalScoredAObs = new Observer<Integer>() {
+        @Override
+        public void onChanged(Integer integer) {
+            mTextTeamAScore.setText(String.valueOf(integer));
+            GOAL_SCORED_A = integer;
+
+        }
+    };
+
+    Observer<Integer> mGoalScoredBObs = new Observer<Integer>() {
+        @Override
+        public void onChanged(Integer integer) {
+            mTextTeamBScore.setText(String.valueOf(integer));
+            GOAL_SCORED_B = integer;
+        }
+    };
+    private ConstraintLayout mFragmentContainer;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        mBinding = DataBindingUtil.setContentView(this, R.layout.activity_main);
+
+        mViewModel = ViewModelProviders.of(this).get(GoalScoredModel.class);
 
         mTextTeamAScore = findViewById(R.id.textView_score_team_a);
         mTextTeamBScore = findViewById(R.id.textView_score_team_b);
         mGoalScoredViewA = findViewById(R.id.goal_scored_a);
         mGoalScoredViewB = findViewById(R.id.goal_scored_b);
+        mFragmentContainer = mBinding.fragmentContainer;
 
         initializeFields();
 
-        setupGoalScoredView();
+        //setupGoalScoredView();
     }
 
     private void initializeFields() {
-        mTextTeamAScore.setText(String.valueOf(mScoreA));
-        mTextTeamBScore.setText(String.valueOf(mScoreB));
+        mFragmentContainer.setVisibility(View.GONE);
+
+        mViewModel.setScoreTeamALive();
+        mViewModel.setScoreTeamBLive();
+
+        mViewModel.getScoreTeamALive().observe(this, mGoalScoredAObs);
+        mViewModel.getScoreTeamBLive().observe(this, mGoalScoredBObs);
     }
 
     private void setupGoalScoredView() {
-        int[] goalScoredArrayA = new int[GOAL_SCORED];
+        int[] goalScoredArrayA = new int[GOAL_SCORED_A];
         mGoalScoredViewA.setUpGoalScoredView(goalScoredArrayA);
 
-        int[] goalScoredArrayB = new int[GOAL_SCORED];
+        int[] goalScoredArrayB = new int[GOAL_SCORED_B];
         mGoalScoredViewB.setUpGoalScoredView(goalScoredArrayB);
     }
 
     public void increaseA(View view) {
-        int currentScore = Integer.parseInt((mTextTeamAScore.getText().toString()));
-        mScoreA = ScoreUtil.increaseScore(currentScore);
-        mTextTeamAScore.setText(String.valueOf(mScoreA));
+        mViewModel.increaseA();
+
+        mViewModel.getScoreTeamALive().observe(this, mGoalScoredAObs);
     }
 
     public void increaseB(View view) {
-        int currentScore = Integer.parseInt(mTextTeamBScore.getText().toString());
-        mScoreB = ScoreUtil.increaseScore(currentScore);
-        mTextTeamBScore.setText(String.valueOf(mScoreB));
+        mViewModel.increaseB();
+
+        mViewModel.getScoreTeamBLive().observe(this, mGoalScoredBObs);
     }
 
     public void resetScores(View view) {
-        mTextTeamAScore.setText(String.valueOf(1));
-        mTextTeamBScore.setText(String.valueOf(1));
+        mViewModel.resetScores();
 
-        mScoreA = 1;
-        mScoreB = 1;
+        mViewModel.getScoreTeamALive().observe(this, mGoalScoredAObs);
+        mViewModel.getScoreTeamBLive().observe(this, mGoalScoredBObs);
+    }
+    public void showHideScores(View view) {
+        if (GOAL_SCORED_A == 1 || GOAL_SCORED_B == 1) {
+            return;
+        }
+        mShowScores = !mShowScores;
+        setVisibility();
+        setupGoalScoredView();
     }
 
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-
-        outState.putInt(TEAM_A_SCORE,mScoreA);
-        outState.putInt(TEAM_B_SCORE, mScoreB);
-    }
-
-    @Override
-    protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
-        mScoreA = savedInstanceState.getInt(TEAM_A_SCORE);
-        mScoreB = savedInstanceState.getInt(TEAM_B_SCORE);
-
-        initializeFields();
+    private void setVisibility() {
+        if (mShowScores) {
+            mFragmentContainer.setVisibility(View.VISIBLE);
+        }
+        else {
+            mFragmentContainer.setVisibility(View.GONE);
+        }
     }
 }

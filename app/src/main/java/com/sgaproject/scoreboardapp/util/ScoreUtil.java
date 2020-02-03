@@ -1,4 +1,4 @@
-package com.sgaproject.scoreboardapp;
+package com.sgaproject.scoreboardapp.util;
 
 public class ScoreUtil {
 
